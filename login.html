@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>تسجيل الدخول</title>
+  <style>
+    body {
+      background: #0a0f1f;
+      color: #00d4ff;
+      font-family: Arial;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .box {
+      background: #11172b;
+      padding: 20px;
+      border-radius: 10px;
+      width: 300px;
+      text-align: center;
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 6px;
+      border: none;
+    }
+    button {
+      background: #00d4ff;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<div class="box">
+  <h2>الدخول للموقع</h2>
+  <input type="text" id="name" placeholder="اكتب اسمك">
+  <input type="text" id="account" placeholder="اكتب حسابك">
+  <button onclick="login()">دخول</button>
+  <p id="msg"></p>
+</div>
+
+<script>
+function login() {
+  let name = document.getElementById("name").value;
+  let acc = document.getElementById("account").value;
+
+  if (name && acc) {
+    localStorage.setItem("userName", name);
+    window.location.href = "index.html";
+  } else {
+    document.getElementById("msg").innerText = "اكتب الاسم والحساب";
+  }
+}
+</script>
+
+</body>
+</html>
