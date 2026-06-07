@@ -2,13 +2,13 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>53 Messenger - مراسلة فورية ومشفرة</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>53 Messenger - مراسلة فورية مع دعوات مباشرة</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box;font-family:'Cairo','Segoe UI',sans-serif}
         body{background:linear-gradient(135deg,#0a0a2a,#1a1a3a);min-height:100vh;display:flex;justify-content:center;align-items:center;padding:15px}
         
-        /* شاشة الدخول البسيطة */
+        /* شاشة الدخول */
         .login-box{width:100%;max-width:380px;background:rgba(0,0,0,0.7);backdrop-filter:blur(20px);border-radius:40px;padding:40px 25px;border:2px solid #00ff88;text-align:center}
         .logo{font-size:3rem;margin-bottom:10px}
         h1{color:#fff;margin-bottom:8px;font-size:1.8rem}
@@ -45,28 +45,34 @@
         .msg-sent{background:linear-gradient(135deg,#00ff88,#00aaff);color:#000;align-self:flex-end;border-bottom-right-radius:5px}
         .msg-received{background:rgba(255,255,255,0.1);color:#fff;align-self:flex-start;border-bottom-left-radius:5px}
         .msg-time{font-size:0.65rem;margin-top:5px;opacity:0.7;text-align:right}
+        .invite-msg{font-size:0.7rem;color:#00ff88;margin-top:3px}
         .input-area{padding:15px 20px;background:rgba(0,0,0,0.3);border-top:1px solid #00ff88;display:flex;gap:10px}
         .input-area input{flex:1;padding:12px;margin:0}
         .input-area button{width:50px;padding:0;margin:0}
         .result-card{background:rgba(0,255,136,0.1);border-radius:15px;padding:15px;margin-top:10px;display:flex;justify-content:space-between;align-items:center}
         .empty{text-align:center;padding:40px;color:#888}
-        .share-row{padding:15px;border-top:1px solid rgba(0,255,136,0.2);display:flex;flex-direction:column;gap:10px}
-        .share-btn{background:transparent;border:2px solid #00ff88;color:#00ff88;padding:12px;margin:0}
-        .invite-banner{background:#00ff8822;border:2px solid #00ff88;border-radius:15px;padding:12px;margin-bottom:20px;font-size:13px;text-align:center}
+        .invite-row{padding:15px;border-top:1px solid rgba(0,255,136,0.2);display:flex;flex-direction:column;gap:10px}
+        .invite-btn{background:transparent;border:2px solid #00ff88;color:#00ff88;padding:12px;margin:0}
+        .invite-btn-green{background:#00ff88;border:none;color:#000;padding:12px;margin:0;font-weight:bold}
         
         @media(max-width:768px){.sidebar{position:fixed;left:-300px;top:0;bottom:0;width:280px;z-index:100;transition:0.3s;background:rgba(0,0,0,0.95)}.sidebar.open{left:0}.back-btn{display:block}}
+        
+        /* إشعار الدعوة */
+        .invite-notification{position:fixed;bottom:20px;left:20px;right:20px;background:#00ff88;color:#000;padding:15px 20px;border-radius:15px;display:none;align-items:center;justify-content:space-between;z-index:200;animation:slideUp 0.3s ease}
+        @keyframes slideUp{from{transform:translateY(100px);opacity:0}to{transform:translateY(0);opacity:1}}
+        .invite-notification button{width:auto;padding:8px 20px;margin:0;background:#000;color:#fff}
     </style>
 </head>
 <body>
 
-<!-- شاشة الدخول البسيطة -->
+<!-- شاشة الدخول -->
 <div id="loginScreen" class="login-box">
     <div class="logo">📱 53</div>
     <h1>مرحباً بك في 53</h1>
-    <p class="sub">تطبيق مراسلة فوري وآمن</p>
+    <p class="sub">مراسلة فورية مع دعوات داخلية</p>
     <input type="tel" id="loginPhone" placeholder="رقم هاتفك" maxlength="10">
     <input type="text" id="loginName" placeholder="اسمك">
-    <button onclick="login()">دخول <i class="fas fa-arrow-left"></i></button>
+    <button onclick="login()">دخول</button>
     <p class="tip">🔒 جميع المحادثات مشفرة وآمنة 100%</p>
 </div>
 
@@ -79,16 +85,15 @@
         </div>
         <div class="search-area">
             <div class="search-box">
-                <input type="tel" id="searchPhone" placeholder="🔍 ابحث برقم هاتف" maxlength="10">
+                <input type="tel" id="searchPhone" placeholder="🔍 ابحث برقم الهاتف" maxlength="10">
                 <button onclick="searchUser()">بحث</button>
             </div>
             <div id="searchResult"></div>
         </div>
         <div class="chats" id="chatsList"><div class="empty">📭 لا توجد محادثات<br>ابحث عن أصدقاء</div></div>
-        <div class="share-row">
-            <button class="share-btn" onclick="copyAppLink()">📋 نسخ رابط التطبيق</button>
-            <button class="share-btn" onclick="shareWhatsApp()">💚 مشاركة رابط واتساب</button>
-            <button class="share-btn" onclick="logout()">🚪 تسجيل خروج</button>
+        <div class="invite-row">
+            <button class="invite-btn-green" onclick="showInviteDialog()">📨 إرسال دعوة لصديق</button>
+            <button class="invite-btn" onclick="logout()">🚪 تسجيل خروج</button>
         </div>
     </div>
     <div class="main-chat">
@@ -105,33 +110,137 @@
     </div>
 </div>
 
+<!-- نافذة إرسال الدعوة -->
+<div id="inviteDialog" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);z-index:300;align-items:center;justify-content:center">
+    <div style="background:#1a1a3a;padding:30px;border-radius:30px;width:90%;max-width:350px;text-align:center;border:2px solid #00ff88">
+        <h3 style="color:#00ff88;margin-bottom:20px">📨 إرسال دعوة</h3>
+        <input type="tel" id="invitePhone" placeholder="رقم هاتف الصديق" maxlength="10" style="width:100%;padding:15px;margin-bottom:15px;border-radius:15px;border:2px solid #00ff88;background:#000;color:#fff;text-align:center">
+        <button onclick="sendDirectInvite()" style="background:#00ff88;color:#000;padding:15px;border-radius:15px;width:100%;margin-bottom:10px;border:none;font-weight:bold">إرسال الدعوة</button>
+        <button onclick="closeInviteDialog()" style="background:transparent;border:2px solid #ff4444;color:#ff4444;padding:15px;border-radius:15px;width:100%">إلغاء</button>
+    </div>
+</div>
+
+<!-- إشعار الدعوة الواردة -->
+<div id="inviteNotification" class="invite-notification">
+    <span id="inviteMessage">📨 لديك دعوة جديدة!</span>
+    <button onclick="acceptInvite()">قبول</button>
+</div>
+
 <script>
-    // ==================== 53 MESSENGER - نسخة نهائية شغالة 100% ====================
+    // ==================== 53 MESSENGER - مع دعوات داخلية مباشرة ====================
     
     let currentUser = null;
     let currentChat = null;
     let allUsers = JSON.parse(localStorage.getItem('53_users') || '{}');
     let allChats = JSON.parse(localStorage.getItem('53_chats') || '{}');
     let pendingInvites = JSON.parse(localStorage.getItem('53_invites') || '[]');
+    let lastInviteCheck = 0;
     let refreshTimer = null;
     
-    // الحصول على رابط التطبيق الحقيقي
-    function getAppUrl(){
-        let url = window.location.href;
-        url = url.split('?')[0].split('#')[0];
-        return url;
+    // إظهار نافذة الدعوة
+    function showInviteDialog(){
+        document.getElementById('inviteDialog').style.display = 'flex';
+        document.getElementById('invitePhone').value = '';
     }
     
-    function copyAppLink(){
-        const url = getAppUrl();
-        navigator.clipboard.writeText(url);
-        alert(`✅ تم نسخ الرابط!\n\n${url}\n\nأرسله لأصدقائك عبر واتساب.`);
+    function closeInviteDialog(){
+        document.getElementById('inviteDialog').style.display = 'none';
     }
     
-    function shareWhatsApp(){
-        const url = getAppUrl();
-        const text = `🌟 انضم إلي على تطبيق 53 للمراسلة!\n📱 ${url}\n🔒 محادثات مشفرة وآمنة`;
-        window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+    // إرسال دعوة مباشرة (داخل التطبيق)
+    function sendDirectInvite(){
+        const toPhone = document.getElementById('invitePhone').value.trim();
+        if(!toPhone || toPhone.length < 9){
+            alert('الرجاء إدخال رقم هاتف صحيح');
+            return;
+        }
+        if(toPhone === currentUser.phone){
+            alert('لا يمكنك دعوة نفسك');
+            return;
+        }
+        
+        // التحقق من وجود المستخدم
+        if(!allUsers[toPhone]){
+            alert(`❌ المستخدم ${toPhone} غير مسجل في التطبيق!\n\nيرجى مشاركة رابط التطبيق معه أولاً.`);
+            closeInviteDialog();
+            return;
+        }
+        
+        // التحقق من وجود دعوة مسبقة
+        const existing = pendingInvites.some(inv => (inv.from === currentUser.phone && inv.to === toPhone) || (inv.from === toPhone && inv.to === currentUser.phone));
+        if(existing){
+            alert('طلب صداقة موجود بالفعل');
+            closeInviteDialog();
+            return;
+        }
+        
+        // إرسال الدعوة
+        pendingInvites.push({
+            id: Date.now(),
+            from: currentUser.phone,
+            fromName: currentUser.name,
+            to: toPhone,
+            status: 'pending',
+            timestamp: Date.now()
+        });
+        localStorage.setItem('53_invites', JSON.stringify(pendingInvites));
+        
+        alert(`✅ تم إرسال الدعوة إلى ${allUsers[toPhone]?.name || toPhone}\n⏳ في انتظار الموافقة`);
+        closeInviteDialog();
+        
+        // محاولة إشعار الطرف الآخر فوراً (عن طريق التحديث)
+        checkIncomingInvites();
+    }
+    
+    // قبول الدعوة
+    let currentInvite = null;
+    function acceptInvite(){
+        if(currentInvite){
+            // إضافة المحادثة للطرفين
+            const myChats = allChats[currentUser.phone] || [];
+            if(!myChats.some(c => c.with === currentInvite.from)){
+                myChats.push({
+                    with: currentInvite.from,
+                    lastMsg: 'بدأت المحادثة',
+                    lastTime: new Date().toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'})
+                });
+                allChats[currentUser.phone] = myChats;
+            }
+            
+            const theirChats = allChats[currentInvite.from] || [];
+            if(!theirChats.some(c => c.with === currentUser.phone)){
+                theirChats.push({
+                    with: currentUser.phone,
+                    lastMsg: 'بدأت المحادثة',
+                    lastTime: new Date().toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'})
+                });
+                allChats[currentInvite.from] = theirChats;
+            }
+            
+            localStorage.setItem('53_chats', JSON.stringify(allChats));
+            
+            // إزالة الدعوة من القائمة
+            pendingInvites = pendingInvites.filter(inv => !(inv.from === currentInvite.from && inv.to === currentUser.phone));
+            localStorage.setItem('53_invites', JSON.stringify(pendingInvites));
+            
+            alert(`✅ تمت إضافة ${currentInvite.fromName} إلى محادثاتك!`);
+            document.getElementById('inviteNotification').style.display = 'none';
+            loadChats();
+            currentInvite = null;
+        }
+    }
+    
+    // التحقق من الدعوات الواردة
+    function checkIncomingInvites(){
+        if(!currentUser) return;
+        
+        const myInvites = pendingInvites.filter(inv => inv.to === currentUser.phone && inv.status === 'pending');
+        
+        if(myInvites.length > 0 && !currentInvite){
+            currentInvite = myInvites[0];
+            document.getElementById('inviteMessage').innerHTML = `📨 ${currentInvite.fromName} (${currentInvite.from}) يريد إضافتك كصديق!`;
+            document.getElementById('inviteNotification').style.display = 'flex';
+        }
     }
     
     function updateUI(){
@@ -146,7 +255,7 @@
         const container = document.getElementById('chatsList');
         const myChats = allChats[currentUser.phone] || [];
         if(myChats.length === 0){
-            container.innerHTML = '<div class="empty">📭 لا توجد محادثات<br>ابحث عن أصدقاء</div>';
+            container.innerHTML = '<div class="empty">📭 لا توجد محادثات<br>ابحث عن أصدقاء أو أرسل دعوة</div>';
             return;
         }
         container.innerHTML = myChats.map(chat => {
@@ -205,7 +314,6 @@
         msgs.push({id:Date.now(), sender:currentUser.phone, receiver:currentChat, text:text, time:timeStr});
         localStorage.setItem(`chat_${chatId}`, JSON.stringify(msgs));
         
-        // تحديث آخر رسالة في المحادثات
         const myChats = allChats[currentUser.phone] || [];
         const idx = myChats.findIndex(c => c.with === currentChat);
         if(idx !== -1){ myChats[idx].lastMsg = text; myChats[idx].lastTime = timeStr; }
@@ -220,7 +328,6 @@
         
         localStorage.setItem('53_chats', JSON.stringify(allChats));
         
-        // حفظ الرسالة عند الطرف الآخر
         const rchatId = [currentChat, currentUser.phone].sort().join('_');
         const rmsgs = JSON.parse(localStorage.getItem(`chat_${rchatId}`) || '[]');
         rmsgs.push({id:Date.now(), sender:currentUser.phone, receiver:currentChat, text:text, time:timeStr});
@@ -237,61 +344,32 @@
         const user = allUsers[phone];
         const resultDiv = document.getElementById('searchResult');
         if(!user){
-            resultDiv.innerHTML = `<div class="result-card"><div><strong>❌ غير موجود</strong><br>${phone}</div><div><button onclick="sendInviteLink('${phone}')">📋 إرسال رابط الدعوة</button></div></div>`;
+            resultDiv.innerHTML = `<div class="result-card"><div><strong>❌ غير مسجل</strong><br>${phone}</div><div><button onclick="copyInviteLink()">📋 نسخ رابط التسجيل</button></div></div>`;
             return;
         }
-        const hasPending = pendingInvites.some(inv => (inv.from === currentUser.phone && inv.to === phone) || (inv.from === phone && inv.to === currentUser.phone));
         const isFriend = (allChats[currentUser.phone] || []).some(c => c.with === phone);
+        const hasPending = pendingInvites.some(inv => (inv.from === currentUser.phone && inv.to === phone));
         resultDiv.innerHTML = `<div class="result-card">
             <div><strong>${user.name}</strong><br>${user.phone}</div>
-            <div>${isFriend ? `<button onclick="openChat('${phone}')">💬 دردشة</button>` : hasPending ? `<button disabled>⏳ قيد الانتظار</button>` : `<button onclick="sendRequest('${phone}')">➕ إرسال طلب</button>`}</div>
+            <div>${isFriend ? `<button onclick="openChat('${phone}')">💬 دردشة</button>` : hasPending ? `<button disabled>⏳ قيد الانتظار</button>` : `<button onclick="sendDirectInviteTo('${phone}')">📨 إرسال دعوة</button>`}</div>
         </div>`;
     }
     
-    function sendRequest(toPhone){
-        if(toPhone === currentUser.phone){ alert('لا يمكنك إضافة نفسك'); return; }
-        const existing = pendingInvites.some(inv => (inv.from === currentUser.phone && inv.to === toPhone) || (inv.from === toPhone && inv.to === currentUser.phone));
+    function sendDirectInviteTo(phone){
+        if(phone === currentUser.phone){ alert('لا يمكنك إضافة نفسك'); return; }
+        const existing = pendingInvites.some(inv => (inv.from === currentUser.phone && inv.to === phone) || (inv.from === phone && inv.to === currentUser.phone));
         if(existing){ alert('طلب موجود مسبقاً'); return; }
-        pendingInvites.push({id:Date.now(), from:currentUser.phone, fromName:currentUser.name, to:toPhone, status:'pending'});
+        pendingInvites.push({id:Date.now(), from:currentUser.phone, fromName:currentUser.name, to:phone, status:'pending', timestamp:Date.now()});
         localStorage.setItem('53_invites', JSON.stringify(pendingInvites));
-        alert(`✅ تم إرسال طلب إلى ${allUsers[toPhone]?.name || toPhone}`);
+        alert(`✅ تم إرسال الدعوة إلى ${allUsers[phone]?.name || phone}`);
         document.getElementById('searchResult').innerHTML = '';
         document.getElementById('searchPhone').value = '';
-        checkInvites();
     }
     
-    function sendInviteLink(phone){
-        const url = getAppUrl();
+    function copyInviteLink(){
+        const url = window.location.href.split('?')[0];
         navigator.clipboard.writeText(url);
-        alert(`✅ تم نسخ الرابط!\nأرسله إلى ${phone} عبر واتساب ليسجل ويتواصل معك.`);
-    }
-    
-    function checkInvites(){
-        if(!currentUser) return;
-        const myInvites = pendingInvites.filter(inv => inv.to === currentUser.phone && inv.status === 'pending');
-        if(myInvites.length > 0){
-            myInvites.forEach(invite => {
-                const fromUser = allUsers[invite.from];
-                if(fromUser && confirm(`🔔 طلب صداقة جديد!\n\n👤 ${fromUser.name} (${invite.from})\n\nتوافق؟`)){
-                    invite.status = 'accepted';
-                    const myChats = allChats[currentUser.phone] || [];
-                    if(!myChats.some(c => c.with === invite.from)){
-                        myChats.push({with:invite.from, lastMsg:'بدأت المحادثة', lastTime:new Date().toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'})});
-                        allChats[currentUser.phone] = myChats;
-                    }
-                    const theirChats = allChats[invite.from] || [];
-                    if(!theirChats.some(c => c.with === currentUser.phone)){
-                        theirChats.push({with:currentUser.phone, lastMsg:'بدأت المحادثة', lastTime:new Date().toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'})});
-                        allChats[invite.from] = theirChats;
-                    }
-                    localStorage.setItem('53_chats', JSON.stringify(allChats));
-                    alert(`✅ تمت إضافة ${fromUser.name} إلى محادثاتك!`);
-                    loadChats();
-                }
-            });
-            pendingInvites = pendingInvites.filter(inv => !(inv.to === currentUser.phone && inv.status === 'pending'));
-            localStorage.setItem('53_invites', JSON.stringify(pendingInvites));
-        }
+        alert(`✅ تم نسخ رابط التطبيق!\n${url}\nأرسله للصديق ليسجل ثم أرسل له دعوة.`);
     }
     
     function login(){
@@ -305,9 +383,9 @@
         document.getElementById('loginScreen').style.display = 'none';
         document.getElementById('app').style.display = 'flex';
         updateUI();
-        checkInvites();
+        checkIncomingInvites();
         if(refreshTimer) clearInterval(refreshTimer);
-        refreshTimer = setInterval(() => { checkInvites(); loadChats(); if(currentChat) loadMessages(); }, 3000);
+        refreshTimer = setInterval(() => { checkIncomingInvites(); loadChats(); if(currentChat) loadMessages(); }, 2000);
     }
     
     function logout(){
@@ -317,6 +395,8 @@
             localStorage.removeItem('53_current');
             document.getElementById('loginScreen').style.display = 'block';
             document.getElementById('app').style.display = 'none';
+            document.getElementById('inviteNotification').style.display = 'none';
+            currentInvite = null;
         }
     }
     
@@ -330,8 +410,8 @@
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('app').style.display = 'flex';
                 updateUI();
-                checkInvites();
-                refreshTimer = setInterval(() => { checkInvites(); loadChats(); if(currentChat) loadMessages(); }, 3000);
+                checkIncomingInvites();
+                refreshTimer = setInterval(() => { checkIncomingInvites(); loadChats(); if(currentChat) loadMessages(); }, 2000);
             }
         }
     }
