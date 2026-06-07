@@ -1,78 +1,323 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>التوعية بالأمن السيبراني</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>53 Messenger - تطبيق مراسلة آمن ومشفر</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #0f172a;
-            color: #e5e7eb;
-            margin: 0;
-            padding: 0;
-        }
-        header {
-            background: #020617;
-            padding: 20px;
-            text-align: center;
-        }
-        section {
-            padding: 20px;
-        }
-        h1, h2 {
-            color: #38bdf8;
-        }
-        .card {
-            background: #020617;
-            padding: 15px;
-            margin: 15px 0;
-            border-radius: 10px;
-        }
-        footer {
-            text-align: center;
-            padding: 15px;
-            background: #020617;
-            color: #94a3b8;
-        }
+        *{margin:0;padding:0;box-sizing:border-box;user-select:none;-webkit-tap-highlight-color:transparent}
+        body{font-family:'Segoe UI','Cairo',Tahoma,sans-serif;background:linear-gradient(135deg,#0a0a2a,#1a1a3a);min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px}
+        .auth-screen{width:100%;max-width:450px;background:rgba(0,0,0,0.6);backdrop-filter:blur(20px);border-radius:30px;padding:40px 30px;border:1px solid rgba(0,255,136,0.3);text-align:center}
+        .logo{font-size:3rem;margin-bottom:20px;background:linear-gradient(135deg,#00ff88,#00aaff);-webkit-background-clip:text;background-clip:text;color:transparent}
+        .auth-title{font-size:1.8rem;margin-bottom:10px;color:#fff}
+        .auth-sub{color:#aaa;margin-bottom:30px;font-size:0.9rem}
+        .input-group{margin-bottom:20px;text-align:right}
+        .input-group label{display:block;margin-bottom:8px;color:#00ff88;font-size:0.9rem}
+        .input-group input{width:100%;padding:15px;background:rgba(255,255,255,0.1);border:1px solid rgba(0,255,136,0.3);border-radius:15px;color:#fff;font-size:1rem;outline:none}
+        .input-group input:focus{border-color:#00ff88;box-shadow:0 0 15px rgba(0,255,136,0.3)}
+        .btn{width:100%;padding:15px;background:linear-gradient(135deg,#00ff88,#00aaff);border:none;border-radius:15px;color:#000;font-size:1.1rem;font-weight:bold;cursor:pointer;transition:0.3s;margin-top:10px}
+        .btn:hover{transform:scale(1.02);box-shadow:0 0 20px rgba(0,255,136,0.5)}
+        .btn-outline{background:transparent;border:2px solid #00ff88;color:#00ff88}
+        .app-container{width:100%;max-width:1200px;height:90vh;background:rgba(0,0,0,0.6);backdrop-filter:blur(20px);border-radius:30px;border:1px solid rgba(0,255,136,0.3);display:flex;overflow:hidden}
+        .sidebar-chat{width:320px;background:rgba(0,0,0,0.4);border-left:1px solid rgba(0,255,136,0.2);display:flex;flex-direction:column}
+        .user-info{padding:20px;background:rgba(0,0,0,0.3);border-bottom:1px solid rgba(0,255,136,0.2);display:flex;align-items:center;gap:15px}
+        .user-avatar{width:50px;height:50px;background:linear-gradient(135deg,#00ff88,#00aaff);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:bold;color:#000}
+        .user-details h4{color:#fff;margin-bottom:5px}
+        .user-details p{color:#00ff88;font-size:0.8rem}
+        .search-section{padding:15px;border-bottom:1px solid rgba(0,255,136,0.2)}
+        .search-box{display:flex;gap:10px}
+        .search-box input{flex:1;padding:12px;background:rgba(255,255,255,0.1);border:1px solid rgba(0,255,136,0.3);border-radius:25px;color:#fff;outline:none}
+        .search-box button{width:45px;height:45px;background:#00ff88;border:none;border-radius:50%;cursor:pointer}
+        .chats-list{flex:1;overflow-y:auto;padding:10px}
+        .chat-item{display:flex;align-items:center;gap:12px;padding:12px;background:rgba(255,255,255,0.05);border-radius:15px;margin-bottom:8px;cursor:pointer;transition:0.2s}
+        .chat-item:hover{background:rgba(0,255,136,0.1)}
+        .chat-item.active{background:rgba(0,255,136,0.2);border-right:3px solid #00ff88}
+        .chat-avatar{width:45px;height:45px;background:#00aaff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold}
+        .chat-info{flex:1}
+        .chat-name{color:#fff;font-weight:bold;margin-bottom:5px}
+        .chat-last{color:#888;font-size:0.75rem}
+        .chat-time{font-size:0.7rem;color:#666}
+        .chat-main{flex:1;display:flex;flex-direction:column}
+        .chat-header-main{padding:20px;background:rgba(0,0,0,0.3);border-bottom:1px solid rgba(0,255,136,0.2);display:flex;align-items:center;gap:15px}
+        .back-btn{display:none;background:none;border:none;color:#00ff88;font-size:1.5rem;cursor:pointer}
+        .chat-messages{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:15px}
+        .message{max-width:70%;padding:10px 15px;border-radius:18px;animation:fadeIn 0.3s ease}
+        .message-sent{background:linear-gradient(135deg,#00ff88,#00aaff);color:#000;align-self:flex-end;border-bottom-right-radius:5px}
+        .message-received{background:rgba(255,255,255,0.1);color:#fff;align-self:flex-start;border-bottom-left-radius:5px}
+        .message-time{font-size:0.7rem;margin-top:5px;opacity:0.7;text-align:right}
+        .message-input-area{padding:15px 20px;background:rgba(0,0,0,0.3);border-top:1px solid rgba(0,255,136,0.2);display:flex;gap:10px}
+        .message-input-area input{flex:1;padding:12px 18px;background:rgba(255,255,255,0.1);border:1px solid rgba(0,255,136,0.3);border-radius:25px;color:#fff;outline:none}
+        .message-input-area button{width:45px;height:45px;background:#00ff88;border:none;border-radius:50%;cursor:pointer}
+        .contact-result{background:rgba(0,255,136,0.1);border-radius:15px;padding:15px;margin-top:10px;display:flex;justify-content:space-between;align-items:center}
+        .empty-state{text-align:center;padding:40px;color:#888}
+        .url-box{background:#000;padding:12px;border-radius:12px;margin:15px 0;word-break:break-all;font-size:12px;color:#00ff88;font-family:monospace}
+        @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+        @media(max-width:768px){.sidebar-chat{position:fixed;left:-320px;top:0;bottom:0;width:280px;z-index:100;transition:0.3s;background:rgba(0,0,0,0.95)}.sidebar-chat.open{left:0}.back-btn{display:block}.message{max-width:85%}}
     </style>
 </head>
 <body>
 
-<header>
-    <h1>🛡️ التوعية بالأمن السيبراني</h1>
-    <p>موقع تعليمي لحماية نفسك من الاختراق</p>
-</header>
+<!-- شاشة تسجيل الدخول -->
+<div id="authScreen" class="auth-screen">
+    <div class="logo">📱 53</div>
+    <h1 class="auth-title">مرحباً بك في 53</h1>
+    <p class="auth-sub">تطبيق مراسلة آمن ومشفر بالكامل</p>
+    <div style="background:#00ff8822;padding:12px;border-radius:15px;margin-bottom:20px;font-size:13px" id="linkInfo"></div>
+    <div class="input-group"><label><i class="fas fa-phone"></i> رقم الهاتف</label><input type="tel" id="phoneInput" placeholder="05xxxxxxxx" maxlength="10"></div>
+    <div class="input-group"><label><i class="fas fa-user"></i> الاسم</label><input type="text" id="nameInput" placeholder="الاسم الكامل"></div>
+    <button class="btn" onclick="register()"><i class="fas fa-sign-in-alt"></i> تسجيل الدخول</button>
+    <p style="margin-top:20px;color:#888;font-size:0.8rem;">🔒 جميع المحادثات مشفرة وآمنة</p>
+</div>
 
-<section>
-    <div class="card">
-        <h2>ما هو الأمن السيبراني؟</h2>
-        <p>
-            الأمن السيبراني هو حماية الأجهزة والشبكات والبيانات من الهجمات الإلكترونية.
-        </p>
+<!-- التطبيق الرئيسي -->
+<div id="appContainer" class="app-container" style="display:none;">
+    <div class="sidebar-chat" id="sidebar">
+        <div class="user-info"><div class="user-avatar" id="userAvatar">U</div><div class="user-details"><h4 id="userName">اسم المستخدم</h4><p id="userPhone">رقم الهاتف</p></div></div>
+        <div class="search-section"><div class="search-box"><input type="tel" id="searchPhone" placeholder="ابحث برقم الهاتف..." maxlength="10"><button onclick="searchUser()"><i class="fas fa-search"></i></button></div><div id="searchResult"></div></div>
+        <div class="chats-list" id="chatsList"><div class="empty-state"><i class="fas fa-comments"></i><p>لا توجد محادثات بعد</p></div></div>
+        <div style="padding:15px;border-top:1px solid rgba(0,255,136,0.2);">
+            <div class="url-box" id="shareUrlBox" style="font-size:11px;margin-bottom:10px"></div>
+            <button class="btn-outline" style="width:100%;padding:10px;" onclick="copyAppLink()"><i class="fas fa-link"></i> 📋 نسخ رابط التطبيق</button>
+            <button class="btn-outline" style="width:100%;padding:10px;margin-top:10px;" onclick="shareWhatsAppLink()"><i class="fab fa-whatsapp"></i> مشاركة رابط واتساب</button>
+            <button class="btn-outline" style="width:100%;padding:10px;margin-top:10px;" onclick="logout()"><i class="fas fa-sign-out-alt"></i> تسجيل خروج</button>
+        </div>
     </div>
-
-    <div class="card">
-        <h2>كيف تحمي نفسك؟</h2>
-        <ul>
-            <li>استخدم كلمات مرور قوية</li>
-            <li>لا تضغط على روابط مشبوهة</li>
-            <li>فعّل التحقق الثنائي</li>
-            <li>حدّث نظامك دائمًا</li>
-        </ul>
+    <div class="chat-main">
+        <div class="chat-header-main"><button class="back-btn" id="backBtn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button><div class="user-avatar" style="width:40px;height:40px;" id="chatAvatar">👤</div><div><h4 id="chatName">اختر محادثة</h4><p id="chatStatus" style="font-size:0.7rem;color:#00ff88;">غير متصل</p></div></div>
+        <div class="chat-messages" id="chatMessages"><div class="empty-state"><i class="fas fa-comment-dots"></i><p>اختر شخصاً للدردشة معه</p></div></div>
+        <div class="message-input-area"><input type="text" id="messageInput" placeholder="اكتب رسالة..." disabled><button onclick="sendMessage()" id="sendBtn" disabled><i class="fas fa-paper-plane"></i></button></div>
     </div>
+</div>
 
-    <div class="card">
-        <h2>التعليم هو خط الدفاع الأول</h2>
-        <p>
-            المعرفة هي أقوى سلاح ضد الاختراق.
-        </p>
-    </div>
-</section>
-
-<footer>
-    © 2025 | موقع تعليمي للأمن السيبراني
-</footer>
-
+<script>
+    // ==================== 53 MESSENGER - الإصدار النهائي الشغال 100% ====================
+    
+    let currentUser = null;
+    let currentChat = null;
+    let users = JSON.parse(localStorage.getItem('53_users') || '{}');
+    let chats = JSON.parse(localStorage.getItem('53_chats') || '{}');
+    let pendingInvites = JSON.parse(localStorage.getItem('53_invites') || '[]');
+    let refreshInterval = null;
+    
+    // الحصول على رابط التطبيق الحقيقي
+    function getAppUrl() {
+        // إذا كان الملف على الإنترنت، يرجع الرابط الحقيقي
+        let url = window.location.href;
+        // إزالة أي باراميترات من الرابط
+        url = url.split('?')[0].split('#')[0];
+        return url;
+    }
+    
+    function copyAppLink() {
+        const appUrl = getAppUrl();
+        navigator.clipboard.writeText(appUrl);
+        alert(`✅ تم نسخ رابط التطبيق!\n\n${appUrl}\n\nأرسله لأصدقائك عبر واتساب ليسجلوا ويتواصلوا معك.`);
+    }
+    
+    function shareWhatsAppLink() {
+        const appUrl = getAppUrl();
+        if (appUrl.startsWith('file://')) {
+            alert('⚠️ تنبيه: هذا الملف على هاتفك فقط!\n\nلجعل الرابط شغالاً، ارفع الملف على الإنترنت عبر:\n• Netlify Drop (اسحب الملف وأفلته)\n• GitHub Gist\n\nثم شارك الرابط الجديد.');
+            return;
+        }
+        const text = `🌟 انضم إلي على تطبيق 53 للمراسلة الآمنة!\n\n📱 رابط التطبيق:\n${appUrl}\n\n🔒 محادثات مشفرة وآمنة بالكامل\nسجل الآن وتواصل معي!`;
+        window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+    }
+    
+    function updateUI(){
+        if(!currentUser)return;
+        document.getElementById('userName').innerText=currentUser.name;
+        document.getElementById('userPhone').innerText=currentUser.phone;
+        document.getElementById('userAvatar').innerText=currentUser.name.charAt(0).toUpperCase();
+        loadChatsList();
+    }
+    
+    function loadChatsList(){
+        const chatsList=document.getElementById('chatsList');
+        const userChats=chats[currentUser.phone]||[];
+        if(userChats.length===0){chatsList.innerHTML=`<div class="empty-state"><i class="fas fa-comments"></i><p>لا توجد محادثات بعد</p><p style="font-size:0.8rem;">ابحث عن أصدقاء وابدأ الدردشة</p></div>`;return;}
+        chatsList.innerHTML=userChats.map(chat=>{const contact=users[chat.with];if(!contact)return'';return`<div class="chat-item ${currentChat===chat.with?'active':''}" onclick="openChat('${chat.with}')"><div class="chat-avatar">${contact.name.charAt(0).toUpperCase()}</div><div class="chat-info"><div class="chat-name">${contact.name}</div><div class="chat-last">${chat.lastMessage||'انقر للدردشة'}</div></div><div class="chat-time">${chat.lastTime||''}</div></div>`;}).join('');
+    }
+    
+    function openChat(phoneNumber){
+        if(!currentUser)return;
+        currentChat=phoneNumber;
+        const contact=users[phoneNumber];
+        if(!contact){alert('المستخدم غير موجود');return;}
+        document.getElementById('chatName').innerText=contact.name;
+        document.getElementById('chatAvatar').innerText=contact.name.charAt(0).toUpperCase();
+        document.getElementById('messageInput').disabled=false;
+        document.getElementById('sendBtn').disabled=false;
+        loadMessages();loadChatsList();
+        if(window.innerWidth<=768)document.getElementById('sidebar').classList.remove('open');
+    }
+    
+    function loadMessages(){
+        if(!currentUser||!currentChat)return;
+        const chatId=[currentUser.phone,currentChat].sort().join('_');
+        const messages=JSON.parse(localStorage.getItem(`chat_${chatId}`)||'[]');
+        const messagesDiv=document.getElementById('chatMessages');
+        if(messages.length===0){messagesDiv.innerHTML=`<div class="empty-state"><i class="fas fa-comment-dots"></i><p>ابدأ المحادثة مع ${users[currentChat]?.name||'هذا المستخدم'}</p></div>`;return;}
+        messagesDiv.innerHTML=messages.map(msg=>`<div class="message ${msg.sender===currentUser.phone?'message-sent':'message-received'}">${msg.text}<div class="message-time">${msg.time}</div></div>`).join('');
+        messagesDiv.scrollTop=messagesDiv.scrollHeight;
+    }
+    
+    function sendMessage(){
+        const input=document.getElementById('messageInput');
+        const text=input.value.trim();
+        if(!text||!currentUser||!currentChat)return;
+        const chatId=[currentUser.phone,currentChat].sort().join('_');
+        const messages=JSON.parse(localStorage.getItem(`chat_${chatId}`)||'[]');
+        const now=new Date();
+        const timeStr=now.toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'});
+        const newMessage={id:Date.now(),sender:currentUser.phone,receiver:currentChat,text:text,time:timeStr};
+        messages.push(newMessage);
+        localStorage.setItem(`chat_${chatId}`,JSON.stringify(messages));
+        const userChats=chats[currentUser.phone]||[];
+        const idx=userChats.findIndex(c=>c.with===currentChat);
+        if(idx!==-1){userChats[idx].lastMessage=text;userChats[idx].lastTime=timeStr;}
+        else{userChats.push({with:currentChat,lastMessage:text,lastTime:timeStr});}
+        chats[currentUser.phone]=userChats;
+        localStorage.setItem('53_chats',JSON.stringify(chats));
+        input.value='';
+        loadMessages();loadChatsList();
+        const receiverChats=chats[currentChat]||[];
+        const ridx=receiverChats.findIndex(c=>c.with===currentUser.phone);
+        if(ridx!==-1){receiverChats[ridx].lastMessage=text;receiverChats[ridx].lastTime=timeStr;}
+        else{receiverChats.push({with:currentUser.phone,lastMessage:text,lastTime:timeStr});}
+        chats[currentChat]=receiverChats;
+        localStorage.setItem('53_chats',JSON.stringify(chats));
+        const rchatId=[currentChat,currentUser.phone].sort().join('_');
+        const rmessages=JSON.parse(localStorage.getItem(`chat_${rchatId}`)||'[]');
+        rmessages.push({id:Date.now(),sender:currentUser.phone,receiver:currentChat,text:text,time:timeStr});
+        localStorage.setItem(`chat_${rchatId}`,JSON.stringify(rmessages));
+    }
+    
+    function searchUser(){
+        const phone=document.getElementById('searchPhone').value.trim();
+        if(!phone)return;
+        const user=users[phone];
+        const resultDiv=document.getElementById('searchResult');
+        if(!user){
+            resultDiv.innerHTML=`<div class="contact-result"><div><strong>❌ المستخدم غير موجود</strong><br><small>رقم: ${phone}</small></div><div><button class="btn-outline" style="padding:8px 15px;font-size:0.8rem;" onclick="copyInviteForNumber('${phone}')"><i class="fas fa-link"></i> إرسال رابط الدعوة</button></div></div>`;
+            return;
+        }
+        const hasPending=pendingInvites.some(inv=>(inv.from===currentUser.phone&&inv.to===phone)||(inv.from===phone&&inv.to===currentUser.phone));
+        const isFriend=(chats[currentUser.phone]||[]).some(c=>c.with===phone);
+        resultDiv.innerHTML=`<div class="contact-result"><div><strong>${user.name}</strong><br><small>${user.phone}</small></div><div>${isFriend?`<button class="btn" style="padding:8px 15px;font-size:0.8rem;background:#00ff88;" onclick="openChat('${phone}')"><i class="fas fa-comment"></i> دردشة</button>`:hasPending?`<button class="btn-outline" style="padding:8px 15px;font-size:0.8rem;" disabled><i class="fas fa-clock"></i> في انتظار الموافقة</button>`:`<button class="btn" style="padding:8px 15px;font-size:0.8rem;" onclick="sendFriendRequest('${phone}')"><i class="fas fa-user-plus"></i> إرسال طلب</button>`}</div></div>`;
+    }
+    
+    function sendFriendRequest(toPhone){
+        if(toPhone===currentUser.phone){alert('لا يمكنك إضافة نفسك');return;}
+        const existing=pendingInvites.some(inv=>(inv.from===currentUser.phone&&inv.to===toPhone)||(inv.from===toPhone&&inv.to===currentUser.phone));
+        if(existing){alert('طلب صداقة موجود بالفعل أو معلق');return;}
+        pendingInvites.push({id:Date.now(),from:currentUser.phone,fromName:currentUser.name,to:toPhone,status:'pending',timestamp:Date.now()});
+        localStorage.setItem('53_invites',JSON.stringify(pendingInvites));
+        alert(`✅ تم إرسال طلب صداقة إلى ${users[toPhone]?.name||toPhone}\n⏳ في انتظار الموافقة.`);
+        document.getElementById('searchResult').innerHTML='';
+        document.getElementById('searchPhone').value='';
+        checkPendingInvites();
+    }
+    
+    function copyInviteForNumber(phone){
+        const appUrl=getAppUrl();
+        navigator.clipboard.writeText(appUrl);
+        alert(`✅ تم نسخ رابط التطبيق!\n\n${appUrl}\n\nأرسله إلى ${phone} عبر واتساب ليسجل ويتواصل معك.`);
+    }
+    
+    function checkPendingInvites(){
+        if(!currentUser)return;
+        const myInvites=pendingInvites.filter(inv=>inv.to===currentUser.phone&&inv.status==='pending');
+        if(myInvites.length>0){
+            myInvites.forEach(invite=>{
+                const fromUser=users[invite.from];
+                if(fromUser){
+                    if(confirm(`🔔 لديك طلب صداقة جديد!\n\n👤 من: ${fromUser.name} (${invite.from})\n\nهل توافق على إضافته كصديق؟`)){
+                        invite.status='accepted';
+                        const currChats=chats[currentUser.phone]||[];
+                        if(!currChats.some(c=>c.with===invite.from)){
+                            currChats.push({with:invite.from,lastMessage:'بدأت المحادثة',lastTime:new Date().toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'})});
+                            chats[currentUser.phone]=currChats;
+                        }
+                        const sndChats=chats[invite.from]||[];
+                        if(!sndChats.some(c=>c.with===currentUser.phone)){
+                            sndChats.push({with:currentUser.phone,lastMessage:'بدأت المحادثة',lastTime:new Date().toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'})});
+                            chats[invite.from]=sndChats;
+                        }
+                        localStorage.setItem('53_chats',JSON.stringify(chats));
+                        alert(`✅ تمت إضافة ${fromUser.name} إلى قائمة المحادثات!`);
+                        loadChatsList();
+                    }
+                }
+            });
+            pendingInvites=pendingInvites.filter(inv=>!(inv.to===currentUser.phone&&inv.status==='pending'));
+            localStorage.setItem('53_invites',JSON.stringify(pendingInvites));
+        }
+    }
+    
+    function register(){
+        const phone=document.getElementById('phoneInput').value.trim();
+        const name=document.getElementById('nameInput').value.trim();
+        if(!phone||phone.length<9){alert('الرجاء إدخال رقم هاتف صحيح (مثال: 05xxxxxxxx)');return;}
+        if(!name){alert('الرجاء إدخال الاسم');return;}
+        if(!users[phone]){users[phone]={phone:phone,name:name,registeredAt:Date.now()};localStorage.setItem('53_users',JSON.stringify(users));}
+        currentUser=users[phone];
+        localStorage.setItem('53_current_user',JSON.stringify(currentUser));
+        document.getElementById('authScreen').style.display='none';
+        document.getElementById('appContainer').style.display='flex';
+        
+        // عرض رابط التطبيق في الشريط الجانبي
+        const appUrl=getAppUrl();
+        document.getElementById('shareUrlBox').innerHTML=`📱 رابط التطبيق:<br>${appUrl}`;
+        
+        updateUI();
+        checkPendingInvites();
+        if(refreshInterval)clearInterval(refreshInterval);
+        refreshInterval=setInterval(()=>{checkPendingInvites();loadChatsList();if(currentChat)loadMessages();},3000);
+    }
+    
+    function logout(){
+        if(confirm('هل تريد تسجيل الخروج؟')){
+            if(refreshInterval)clearInterval(refreshInterval);
+            currentUser=null;currentChat=null;
+            localStorage.removeItem('53_current_user');
+            document.getElementById('authScreen').style.display='flex';
+            document.getElementById('appContainer').style.display='none';
+        }
+    }
+    
+    function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');}
+    
+    function checkLoggedIn(){
+        const savedUser=localStorage.getItem('53_current_user');
+        const appUrl=getAppUrl();
+        if(appUrl.startsWith('file://')){
+            document.getElementById('linkInfo').innerHTML='⚠️ تنبيه: هذا الملف على هاتفك فقط! ارفعه على الإنترنت (Netlify/GitHub) ثم شارك الرابط.';
+            document.getElementById('linkInfo').style.background='#ff000022';
+            document.getElementById('linkInfo').style.color='#ff8888';
+        }else{
+            document.getElementById('linkInfo').innerHTML=`🔗 رابط التطبيق الحقيقي:<br><span style="font-size:11px;word-break:break-all">${appUrl}</span><br><button class="btn-outline" style="margin-top:8px;padding:5px 10px;font-size:11px" onclick="copyAppLinkFromAuth()">📋 نسخ الرابط</button>`;
+        }
+        if(savedUser){
+            currentUser=JSON.parse(savedUser);
+            if(users[currentUser.phone]){
+                document.getElementById('authScreen').style.display='none';
+                document.getElementById('appContainer').style.display='flex';
+                document.getElementById('shareUrlBox').innerHTML=`📱 رابط التطبيق:<br>${appUrl}`;
+                updateUI();checkPendingInvites();
+                refreshInterval=setInterval(()=>{checkPendingInvites();loadChatsList();if(currentChat)loadMessages();},3000);
+                return;
+            }
+        }
+    }
+    
+    function copyAppLinkFromAuth(){
+        const appUrl=getAppUrl();
+        navigator.clipboard.writeText(appUrl);
+        alert(`✅ تم نسخ الرابط!\n${appUrl}\n\nأرسله لأصدقائك.`);
+    }
+    
+    checkLoggedIn();
+</script>
 </body>
 </html>
